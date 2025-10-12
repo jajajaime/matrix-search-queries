@@ -45,28 +45,53 @@
 
         .news-article {
             top: 50px;
-            padding: 0 10px;
+            max-width: 700px;
+            max-height: 900px;
+            overflow: hidden;
+            padding: 0 10px 15px;
             background-color: #f4f3ef;
             filter: blur(.8px);
+
+            .title {
+                font-size: 40px;
+            }
+
+            .content {
+                font-size: 25px;
+            }
+
+            &.arabic {
+                position: absolute;
+                top: 80px;
+                right: 45px;
+                max-width: 200px;
+
+                .title {
+                    font-size: 20px;
+                }
+
+                .content {
+                    font-size: 16px;
+                }
+            }
         }
 
         .news-article,
         .image-block {
             position: absolute;
             display: none;
-            overflow: hidden;
             border: 2px solid black;
-            border-bottom: none;
-            max-width: 700px;
-            max-height: 900px;
         }
 
         .image-block {
             top: 100px;
-            left: 680px;
+            left: 750px;
             z-index: 10;
+            width: 500px;
             img {
-                filter: brightness(80%) saturate(80%) grayscale(1) blur(1px) contrast(1.1)
+                display: block;
+                width: 100%;
+                filter: brightness(60%) saturate(80%) grayscale(1) blur(1px) contrast(1.4);
             }
         }
     </style>
@@ -126,16 +151,18 @@
     </div>
 
     <div class="results-block">
-        <div class="news-article">
+        <div class="news-article english">
             <h2 class="title"></h2>
-
             <p class="content"></p>
-
-            <p>Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.</p>
         </div>
 
-        <div class="image-block">
+        <div class="image-block english">
             <img src="" alt="">
+        </div>
+
+        <div class="news-article arabic">
+            <h2 class="title"></h2>
+            <p class="content"></p>
         </div>
     </div>
 
@@ -146,38 +173,72 @@
 
 
         $(document).ready(function() {
-            parseRSS('https://feeds.bbci.co.uk/news/world/rss.xml', handleArticles);
+            handleArticles();
+
+            setTimeout(function() {
+                handleArticlesArabic();
+            }, 4500);
         });
 
-
-        function parseRSS(url, callback) {
-            $.get('https://api.rss2json.com/v1/api.json?rss_url=' + url, function (feed) {
-                handleArticles(feed);
-            });
-        }
-
-        async function handleArticles(feed) {
+        async function handleArticles() {
             while (true) {
+                // let feed = await parseRSS('https://feeds.npr.org/1001/rss.xml');
+                let feed = await parseRSS('https://feeds.bbci.co.uk/news/world/rss.xml');
+
                 for (let i in feed.items) {
-                    await showArticle(feed.items[i]);
-
-                    // break;
+                    await showArticle(feed.items[i], 'english');
                 }
-
-                // break;
             }
         }
 
-        function showArticle(article) {
+        async function handleArticlesArabic() {
+            // arabic feed
+            // https://www.emaratalyoum.com/1.533091?ot=ot.AjaxPageLayout
+            let feedArabic = await parseRSS('https://www.emaratalyoum.com/1.533091?ot=ot.AjaxPageLayout');
+
+            while (true) {
+                for (let i in feedArabic.items) {
+                    await showArticle(feedArabic.items[i], 'arabic');
+                }
+            }
+        }
+
+        function parseRSS(url) {
+            return $.get('https://api.rss2json.com/v1/api.json?rss_url=' + url, function (feed) {
+                return feed;
+            });
+        }
+
+        function showArticle(article, language) {
+            if (typeof language !== 'undefined') {
+                language = '.' + language;
+            }
+            else {
+                language = '';
+            }
+
             return new Promise((resolve, reject) => {
-                $(".news-article").hide();
-                $(".image-block").hide();
-                $(".news-article .title").text(article.title);
-                $(".news-article .content").text(article.content);
-                $(".image-block img").attr('src', article.thumbnail);
-                $(".news-article").slideDown(parseInt(slideDownTime), function() {
-                    $(".image-block").slideDown(parseInt(slideDownTime));
+                $(".news-article"+ language).hide().css('border-bottom', 'none');
+                $(".image-block"+ language).hide().css('border-bottom', 'none');
+                $(".news-article"+ language +" .title").html(article.title);
+                $(".news-article"+ language +" .content").html(article.description);
+                $(".news-article"+ language +" img").remove();
+                $(".news-article"+ language +" a").remove();
+                if (article.thumbnail) {
+                    $(".image-block"+ language +" img").attr('src', article.thumbnail);
+                }
+                
+                $(".news-article"+ language).slideDown(parseInt(slideDownTime), function() {
+                    $(this).css('border-bottom', '');
                 });
+
+                if (article.thumbnail) {
+                    setTimeout(function () {
+                        $(".image-block"+ language).slideDown(parseInt(slideDownTime), function() {
+                            $(this).css('border-bottom', '');
+                        });
+                    }, slideDownTime - 1200)
+                }
 
                 setTimeout(function () {
                     resolve();
