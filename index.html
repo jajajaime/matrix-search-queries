@@ -39,11 +39,16 @@
             .button-group {
                 display: flex;
                 margin-left: 30px;
+
+                &.group-4 {
+                    margin-left: 100px;
+                }
             }
 
             button {
                 width: 30px;
                 height: 30px;
+                font-size: 20px;
             }
         }
 
@@ -58,6 +63,20 @@
             font-size: 18px;
             line-height: 1;
             color: white;
+
+            &.progress {
+                z-index: 10;
+                right: 302px;
+                border-right: unset;
+                background: transparent;
+
+                .loader {
+                    width: 0;
+                    height: 18px;
+                    background: white;
+                    opacity: .9;
+                }
+            }
         }
 
         .searching-block {
@@ -77,7 +96,7 @@
         }
 
         .results-block {
-            padding: 50px;
+            padding: 50px 2px;
         }
 
 
@@ -92,7 +111,6 @@
             top: 70px;
             max-width: 700px;
             max-height: 900px;
-            overflow: hidden;
             padding: 0 10px 15px;
             background-color: #f4f3ef;
             filter: blur(.8px);
@@ -137,7 +155,7 @@
 
             &.french {
                 top: 440px;
-                left: 65px;
+                left: 17px;
                 max-width: 350px;
 
                 .title {
@@ -148,29 +166,30 @@
                     font-size: 18px;
                 }
             }
-        }
 
-        .image-block {
-            top: 100px;
-            left: 750px;
-            z-index: 10;
-            width: 500px;
-            img {
-                display: block;
-                width: 100%;
-                filter: brightness(60%) saturate(80%) grayscale(1) blur(1px) contrast(1.4);
-            }
+            .image-block {
+                top: 20px;
+                right: -470px;
+                z-index: 10;
+                width: 500px;
 
-            &.english2 {
-                top: 575px;
-                right: 395px;
-                width: 300px;
-            }
+                img {
+                    display: block;
+                    width: 100%;
+                    filter: brightness(60%) saturate(80%) grayscale(1) blur(1px) contrast(1.4);
+                }
 
-            &.french {
-                top: 425px;
-                left: 295px;
-                width: 200px;
+                &.english2 {
+                    top: 40px;
+                    left: -290px;
+                    width: 300px;
+                }
+
+                &.french {
+                    top: -8px;
+                    right: -195px;
+                    width: 200px;
+                }
             }
         }
     </style>
@@ -180,49 +199,53 @@
     <div class="button-bar">
         <div class="button-group group-1">
             <button class="">
-                A
+                &#67255;
             </button>
             <button class="">
-                B
+                &#67114;
             </button>
         </div>
 
         <div class="button-group group-2">
             <button class="">
-                C
+                &#8850;
             </button>
             <button class="">
-                D
+                &#11819;
             </button>
             <button class="">
-                C
+                &#8865;
             </button>
             <button class="">
-                D
+                &#66402;
             </button>
         </div>
 
         <div class="button-group group-3">
             <button class="">
-                E
+                &#68249;
             </button>
             <button class="">
-                F
+                &#9707;
             </button>
         </div>
 
         <div class="button-group group-4">
             <button class="">
-                G
+                &#10698;
             </button>
             <button class="">
-                H
+                &#10830;
             </button>
         </div>
     </div>
 
     <div class="download-block">
         <span>Download</span>
+    </div>
+
+    <div class="download-block progress">
+        <div class="loader"></div>
     </div>
 
     <div class="searching-block">
@@ -233,19 +256,19 @@
         <div class="news-article english">
             <h2 class="title"></h2>
             <p class="content"></p>
-        </div>
 
-        <div class="image-block english">
-            <img src="" alt="">
+            <div class="image-block english">
+                <img src="" alt="">
+            </div>
         </div>
 
         <div class="news-article english2">
             <h2 class="title"></h2>
             <p class="content"></p>
-        </div>
 
-        <div class="image-block english2">
-            <img src="" alt="">
+            <div class="image-block english2">
+                <img src="" alt="">
+            </div>
         </div>
 
         <div class="news-article arabic">
@@ -256,10 +279,10 @@
         <div class="news-article french">
             <h2 class="title"></h2>
             <p class="content"></p>
-        </div>
 
-        <div class="image-block french">
-            <img src="" alt="">
+            <div class="image-block french">
+                <img src="" alt="">
+            </div>
         </div>
     </div>
 
@@ -283,7 +306,29 @@
             setTimeout(function() {
                 handleArticlesFrench();
             }, 1829);
+
+            progressBar();
         });
+
+        async function progressBar() {
+            let width = 0;
+
+            while(true) {
+                if (width > 100) {
+                    width = 0;
+                }
+
+                await new Promise((resolve, reject) => {
+                    $('.loader').css('width', width + '%');
+
+                    setTimeout(function() {
+                        resolve();
+                    }, Math.floor(Math.random() * (400) + 100));
+
+                    width += 10;
+                });
+            }
+        }
 
         async function handleArticles() {
             while (true) {
@@ -347,7 +392,7 @@
                 $(".image-block"+ language).hide().css('border-bottom', 'none');
                 $(".news-article"+ language +" .title").html(article.title);
                 $(".news-article"+ language +" .content").html(article.description);
-                $(".news-article"+ language +" img").remove();
+                $(".news-article"+ language +" .content img").remove();
                 $(".news-article"+ language +" a").remove();
                 if (article.thumbnail) {
                     $(".image-block"+ language +" img").attr('src', article.thumbnail);
@@ -362,7 +407,7 @@
                         $(".image-block"+ language).slideDown(parseInt(slideDownTime), function() {
                             $(this).css('border-bottom', '');
                         });
-                    }, slideDownTime - 1200)
+                    }, slideDownTime)// - 1200)
                 }
 
                 setTimeout(function () {
