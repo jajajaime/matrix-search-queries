@@ -10,8 +10,9 @@
         }
 
         body {
+            position: relative;
             height: calc(100vh - 10px);
-            border: 5px solid lightgray;
+            border: 5px solid gray;
             margin: 0;
         }
 
@@ -21,6 +22,7 @@
             right: 0;
             bottom: 0;
             left: 0;
+            margin: -5px;
             background: #03A062;
             opacity: .2;
             filter: alpha(opacity=20) blur(.8px);
@@ -47,7 +49,7 @@
 
         .download-block {
             position: absolute;
-            top: 45px;
+            top: 25px;
             right: 300px;
             min-width: 450px;
             border: 2px solid black;
@@ -60,7 +62,7 @@
 
         .searching-block {
             position: absolute;
-            top: 65px;
+            top: 40px;
             left: 100px;
             z-index: 100;
             border: 4px solid #57976F;
@@ -75,8 +77,15 @@
         }
 
         .results-block {
-            position: relative;
             padding: 50px;
+        }
+
+
+        .news-article,
+        .image-block {
+            position: absolute;
+            display: none;
+            border: 2px solid black;
         }
 
         .news-article {
@@ -96,9 +105,22 @@
                 font-size: 25px;
             }
 
+            &.english2 {
+                top: 440px;
+                right: 65px;
+                max-width: 600px;
+
+                .title {
+                    font-size: 25px;
+                }
+
+                .content {
+                    font-size: 18px;
+                }
+            }
+
             &.arabic {
-                position: absolute;
-                top: 100px;
+                top: 115px;
                 right: 45px;
                 max-width: 200px;
                 direction: rtl;
@@ -112,13 +134,20 @@
                     font-size: 16px;
                 }
             }
-        }
 
-        .news-article,
-        .image-block {
-            position: absolute;
-            display: none;
-            border: 2px solid black;
+            &.french {
+                top: 440px;
+                left: 65px;
+                max-width: 350px;
+
+                .title {
+                    font-size: 25px;
+                }
+
+                .content {
+                    font-size: 18px;
+                }
+            }
         }
 
         .image-block {
@@ -130,6 +159,18 @@
                 display: block;
                 width: 100%;
                 filter: brightness(60%) saturate(80%) grayscale(1) blur(1px) contrast(1.4);
+            }
+
+            &.english2 {
+                top: 575px;
+                right: 395px;
+                width: 300px;
+            }
+
+            &.french {
+                top: 425px;
+                left: 295px;
+                width: 200px;
             }
         }
     </style>
@@ -198,9 +239,27 @@
             <img src="" alt="">
         </div>
 
+        <div class="news-article english2">
+            <h2 class="title"></h2>
+            <p class="content"></p>
+        </div>
+
+        <div class="image-block english2">
+            <img src="" alt="">
+        </div>
+
         <div class="news-article arabic">
             <h2 class="title"></h2>
             <p class="content"></p>
+        </div>
+
+        <div class="news-article french">
+            <h2 class="title"></h2>
+            <p class="content"></p>
+        </div>
+
+        <div class="image-block french">
+            <img src="" alt="">
         </div>
     </div>
 
@@ -214,8 +273,16 @@
             handleArticles();
 
             setTimeout(function() {
+                handleArticlesEnglish2();
+            }, 1112);
+
+            setTimeout(function() {
                 handleArticlesArabic();
             }, 4500);
+
+            setTimeout(function() {
+                handleArticlesFrench();
+            }, 1829);
         });
 
         async function handleArticles() {
@@ -229,14 +296,34 @@
             }
         }
 
+        async function handleArticlesEnglish2() {
+            let feed = await parseRSS('https://feeds.npr.org/1001/rss.xml');
+
+            while (true) {
+                for (let i in feed.items) {
+                    await showArticle(feed.items[i], 'english2');
+                }
+            }
+        }
+
         async function handleArticlesArabic() {
             // arabic feed
             // https://www.emaratalyoum.com/1.533091?ot=ot.AjaxPageLayout
-            let feedArabic = await parseRSS('https://www.emaratalyoum.com/1.533091?ot=ot.AjaxPageLayout');
+            let feed = await parseRSS('https://www.emaratalyoum.com/1.533091?ot=ot.AjaxPageLayout');
 
             while (true) {
-                for (let i in feedArabic.items) {
-                    await showArticle(feedArabic.items[i], 'arabic');
+                for (let i in feed.items) {
+                    await showArticle(feed.items[i], 'arabic');
+                }
+            }
+        }
+
+        async function handleArticlesFrench() {
+            let feed = await parseRSS('https://www.france24.com/fr/rss');
+
+            while (true) {
+                for (let i in feed.items) {
+                    await showArticle(feed.items[i], 'french');
                 }
             }
         }
