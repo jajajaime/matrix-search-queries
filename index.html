@@ -338,7 +338,6 @@
 
         async function handleArticles() {
             while (true) {
-                // let feed = await parseRSS('https://feeds.npr.org/1001/rss.xml');
                 let feed = await parseRSS('https://feeds.bbci.co.uk/news/world/rss.xml');
 
                 for (let i in feed.items) {
@@ -348,9 +347,9 @@
         }
 
         async function handleArticlesEnglish2() {
-            let feed = await parseRSS('https://feeds.npr.org/1001/rss.xml');
-
             while (true) {
+                let feed = await parseRSS('https://feeds.npr.org/1001/rss.xml');
+
                 for (let i in feed.items) {
                     await showArticle(feed.items[i], 'english2');
                 }
@@ -358,8 +357,6 @@
         }
 
         async function handleArticlesArabic() {
-            // arabic feed
-            // https://www.emaratalyoum.com/1.533091?ot=ot.AjaxPageLayout
             let feed = await parseRSS('https://www.emaratalyoum.com/1.533091?ot=ot.AjaxPageLayout');
 
             while (true) {
@@ -370,9 +367,9 @@
         }
 
         async function handleArticlesFrench() {
-            let feed = await parseRSS('https://www.france24.com/fr/rss');
-
             while (true) {
+                let feed = await parseRSS('https://www.france24.com/fr/rss');
+                
                 for (let i in feed.items) {
                     await showArticle(feed.items[i], 'french');
                 }
